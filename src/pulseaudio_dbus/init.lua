@@ -14,7 +14,7 @@
   limitations under the License.
 ]]
 
---[[--
+--[[
   Control audio devices using the
   [pulseaudio DBus interface](https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/Developer/Clients/DBus/).
 
@@ -42,7 +42,7 @@
 ]]
 
 local proxy = require("dbus_proxy")
-local lgi =  require("lgi")
+local lgi   = require("lgi")
 local DBusConnectionFlags = lgi.Gio.DBusConnectionFlags
 
 
@@ -78,14 +78,10 @@ end
 -- @return an `lgi.Gio.DBusConnection` to the pulseaudio server
 -- @see pulse.get_address
 function pulse.get_connection(address, dont_assert)
-
-  local bus = lgi.Gio.DBusConnection.new_for_address_sync(
-                     address,
-                     DBusConnectionFlags.AUTHENTICATION_CLIENT)
+  local bus = lgi.Gio.DBusConnection.new_for_address_sync(address, DBusConnectionFlags.AUTHENTICATION_CLIENT)
 
   if not dont_assert then
-    assert(not bus.closed,
-           string.format("Bus from '%s' is closed!", address))
+    assert(not bus.closed, string.format("Bus from '%s' is closed!", address))
   end
 
   return bus
@@ -107,14 +103,14 @@ end
 -- Note the the `Cards` property may not be up-to-date.
 -- @return array of all available object path cards
 function pulse.Core:get_cards()
-    return self:Get("org.PulseAudio.Core1", "Cards")
+  return self:Get("org.PulseAudio.Core1", "Cards")
 end
 
 --- Get all currently available sources.
 -- Note the the `Sources` property may not be up-to-date.
 -- @return array of all available object path sources
 function pulse.Core:get_sources()
-    return self:Get("org.PulseAudio.Core1", "Sources")
+  return self:Get("org.PulseAudio.Core1", "Sources")
 end
 
 --- Get the current fallback sink object path
@@ -129,9 +125,7 @@ end
 -- @tparam string value fallback sink object path
 -- @see pulse.Core:get_fallback_sink
 function pulse.Core:set_fallback_sink(value)
-  self:Set("org.PulseAudio.Core1",
-           "FallbackSink",
-           lgi.GLib.Variant("o", value))
+  self:Set("org.PulseAudio.Core1", "FallbackSink", lgi.GLib.Variant("o", value))
   self.FallbackSink = {signature="o", value=value}
 end
 
@@ -147,9 +141,7 @@ end
 -- @tparam string value fallback source object path
 -- @see pulse.Core:get_fallback_source
 function pulse.Core:set_fallback_source(value)
-  self:Set("org.PulseAudio.Core1",
-           "FallbackSource",
-           lgi.GLib.Variant("o", value))
+  self:Set("org.PulseAudio.Core1", "FallbackSource", lgi.GLib.Variant("o", value))
   self.FallbackSource = {signature="o", value=value}
 end
 
@@ -218,8 +210,7 @@ local device_states = {
 -- - "suspended": the device is not in use and may be currently closed.
 -- @return the device state as a string
 function pulse.Device:get_state()
-  local current_state =  self:Get("org.PulseAudio.Core1.Device",
-                                  "State")
+  local current_state = self:Get("org.PulseAudio.Core1.Device", "State")
   return device_states[current_state + 1]
 end
 
@@ -230,8 +221,7 @@ end
 -- (one number) per channel
 -- @see pulse.Device:get_volume_percent
 function pulse.Device:get_volume()
-  return self:Get("org.PulseAudio.Core1.Device",
-                  "Volume")
+  return self:Get("org.PulseAudio.Core1.Device", "Volume")
 end
 
 --- Get the volume of the device as a percentage.
@@ -257,9 +247,7 @@ end
 -- for all channels.
 -- @see pulse.Device:set_volume_percent
 function pulse.Device:set_volume(value)
-  self:Set("org.PulseAudio.Core1.Device",
-           "Volume",
-           lgi.GLib.Variant("au", value))
+  self:Set("org.PulseAudio.Core1.Device", "Volume", lgi.GLib.Variant("au", value))
   self.Volume = {signature="au", value=value}
 end
 
@@ -322,8 +310,7 @@ end
 -- @see pulse.Device:toggle_muted
 -- @see pulse.Device:set_muted
 function pulse.Device:is_muted()
-  return self:Get("org.PulseAudio.Core1.Device",
-                  "Mute")
+  return self:Get("org.PulseAudio.Core1.Device", "Mute")
 end
 
 --- Set the muted state of the device.
@@ -333,9 +320,7 @@ end
 -- @see pulse.Device:is_muted
 -- @see pulse.Device:toggle_muted
 function pulse.Device:set_muted(value)
-  self:Set("org.PulseAudio.Core1.Device",
-           "Mute",
-           lgi.GLib.Variant("b", value))
+  self:Set("org.PulseAudio.Core1.Device", "Mute", lgi.GLib.Variant("b", value))
   self.Mute = {signature="b", value=value}
 end
 
